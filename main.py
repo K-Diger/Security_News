@@ -2,11 +2,11 @@
 from bs4 import BeautifulSoup as bs
 from tqdm import tqdm
 import requests
-import re
 from datetime import datetime
 from pytz import timezone
 import csv
-import calendar
+#import calendar
+import time
 
 class security_news:
     def __init__(self):
@@ -44,8 +44,8 @@ class security_news:
 
             self.time_format = input()
 
-            #self.cmp_time1 = str(self.kst[0:4] + self.kst[5:7] + self.kst[8:10])
-            #self.cmp_time2 = str(self.time_format[0:4] + self.time_format[6:8] + self.time_format[10:12])
+            self.cmp_time1 = str(self.kst[0:4] + self.kst[5:7] + self.kst[8:10])
+            self.cmp_time2 = str(self.time_format[0:4] + self.time_format[6:8] + self.time_format[10:12])
 
             print("------------------------------------------------------------------")
             print("[*] " + self.time_format + u"에 해당하는 보안뉴스를 불러옵니다. (최대 50페이지까지 검색 중) [*]")
@@ -66,27 +66,26 @@ class security_news:
             print("입력값 오류")
             exit()
 
-    def print_calendar(self):
-        if self.yes_token == int(1):
-            print("입력한 월의 달력을 불러옵니다. (주말에는 기사가 나오지 않음)")
-            print("------------------------------------------------------------------")
-            self.tf = int(self.time_format[0:4])
-            self.tf_2 = int(self.time_format[7:8])
-            calendar.prmonth(self.tf, self.tf_2)
-            print("------------------------------------------------------------------")
-        else:
-            print("입력한 월의 달력을 불러옵니다. (주말에는 기사가 나오지 않음)")
-            print("------------------------------------------------------------------")
-            self.tf = int(self.time_format[0:4])
-            self.tf_2 = int(self.time_format[7:8])
-            calendar.prmonth(self.tf, self.tf_2)
-            print("------------------------------------------------------------------")
+    # def print_calendar(self):
+    #     if self.yes_token == int(1):
+    #         print("입력한 월의 달력을 불러옵니다. (주말에는 기사가 나오지 않음)")
+    #         print("------------------------------------------------------------------")
+    #         self.tf = int(self.time_format[0:4])
+    #         self.tf_2 = int(self.time_format[7:8])
+    #         calendar.prmonth(self.tf, self.tf_2)
+    #         print("------------------------------------------------------------------")
+    #     else:
+    #         print("입력한 월의 달력을 불러옵니다. (주말에는 기사가 나오지 않음)")
+    #         print("------------------------------------------------------------------")
+    #         self.tf = int(self.time_format[0:4])
+    #         self.tf_2 = int(self.time_format[7:8])
+    #         calendar.prmonth(self.tf, self.tf_2)
+    #         print("------------------------------------------------------------------")
 
     def get_News(self):
         for page in tqdm(range(1, 51)):
             url = "https://www.boannews.com/media/t_list.asp?Page="+str(page)+"&kind="
             self.txt = []  # 뉴스제목을 중복 제거한 집합을 하나씩 받아줄 리스트
-            self.re_ex = re.compile("^/media/view")
             url_req = requests.get(url)
             soup = bs(url_req.text, "html.parser")
 
@@ -131,6 +130,7 @@ class security_news:
     def crwal_to_csv(self):
         self.file = open(u"보안뉴스.csv", 'w', encoding="utf-8", newline="")
         self.csvfile = csv.writer(self.file)
+
         for z in range(len(self.final_txt)):  # csv파일로 추출
             self.csvfile.writerow(["[ " + str(z + 1) + " ]"])
             self.csvfile.writerow([self.final_txt[z]])
@@ -154,7 +154,14 @@ class security_news:
 
 if __name__ == "__main__":
     parse = security_news()
-    parse.print_calendar()
     parse.get_News()
     parse.crwal_to_csv()
     parse.print_crwal()
+
+    print("[!] 창을 닫으려면 아무 키나 입력 [!]")
+    continue_QA = input()
+
+    if continue_QA:
+        exit()
+    else:
+        time.sleep(10000)
